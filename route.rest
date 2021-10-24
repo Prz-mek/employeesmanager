@@ -10,10 +10,10 @@ POST http://localhost:8080/api/employee
 Content-Type: application/json
 
 {
-    "firstName": "Jan",
-    "lastName": "Nowak",
-    "email": "Jan.Nowak@gmail.com",
-    "salary": "3000"
+    "firstName": "Andrzej",
+    "lastName": "Kowalczyk",
+    "email": "kowal@gmail.com",
+    "salary": "3200"
 }
 
 ###
@@ -22,13 +22,13 @@ PUT http://localhost:8080/api/employee
 Content-Type: application/json
 
 {
-    "id": "1",
+    "id": "2",
     "firstName": "Jan",
-    "lastName": "Nowak",
-    "email": "Jan.Nowak@gmail.com",
+    "lastName": "Kowalski",
+    "email": "jan.kowalski@gmail.com",
     "salary": "3500"
 }
 
 ###
 
-DELETE  http://localhost:8080/api/employee/1
+DELETE  http://localhost:8080/api/employee/2
