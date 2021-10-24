@@ -1,0 +1,34 @@
+GET http://localhost:8080/api/employee/all
+
+###
+
+GET http://localhost:8080/api/employee/1
+
+###
+
+POST http://localhost:8080/api/employee
+Content-Type: application/json
+
+{
+    "firstName": "Jan",
+    "lastName": "Nowak",
+    "email": "Jan.Nowak@gmail.com",
+    "salary": "3000"
+}
+
+###
+
+PUT http://localhost:8080/api/employee
+Content-Type: application/json
+
+{
+    "id": "1",
+    "firstName": "Jan",
+    "lastName": "Nowak",
+    "email": "Jan.Nowak@gmail.com",
+    "salary": "3500"
+}
+
+###
+
+DELETE  http://localhost:8080/api/employee/1

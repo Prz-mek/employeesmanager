@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Manager</title>
+</head>
+<body>
+    <h1>Employee Managment Tool</h1>
+
+    <fieldset class="employees__frame">
+        <legend>List of employees</legend>
+        <div class="employees__list"></div>
+    </fieldset>
+
+    <fieldset class="get__frame">
+        <legend>Delete existing employee</legend>
+        
+        <label for="get__id">ID:</label>
+        <input type="number" name="get__id" id="get__id">
+
+        <div class="buttons__area">
+            <button id="get__submit">GET</button>
+        </div>
+
+        <label for="gotten__employee">Gotten empleyee:</label>
+        <span id="gotten__employee"></span>
+    </fieldset>
+
+    <fieldset class="add__frame">
+        <legend>Add new employee</legend>
+   
+        <label for="add__firstname">first name:</label>
+        <input name="" id="add__firstname" maxlength="50">
+
+        <label for="add__lastame">last name:</label>
+        <input name="" id="add__lastname" maxlength="50">
+
+        <label for="add__email">email:</label>
+        <input name="add__email" id="add__email" maxlength="150">
+
+        <label for="add__salary">salary:</label>
+        <input type="number" name="add__salary" id="add__salary" min="0">
+        
+        <div class="buttons__area">
+            <button id="add__submit">ADD</button>
+        </div>
+    </fieldset>
+
+    <fieldset class="put__frame">
+        <legend>Update existing employee</legend>
+    
+        <label for="put__id">ID:</label>
+        <input type="number" name="put__id" id="put__id">
+    
+        <label for="put__firstname">first name:</label>
+        <input name="put__firstname" id="put__firstname" maxlength="50">
+
+        <label for="put__lastame">last name:</label>
+        <input name="put__lastname" id="put__lastname" maxlength="50">
+
+        <label for="put__email">email:</label>
+        <input type="email" name="put__email" id="put__email" maxlength="150">
+
+        <label for="put__salary">salary:</label>
+        <input type="number" name="put__salary" id="put__salary" min="0">
+        
+        <div class="buttons__area">
+            <button id="put__submit">UPDATE</button>
+        </div>
+    </fieldset>
+
+    <fieldset class="delete__frame">
+        <legend>Delete existing employee</legend>
+        
+        <label for="delete__id">ID:</label>
+        <input type="number" name="delete__id" id="delete__id">
+
+        <div class="buttons__area">
+            <button id="delete__submit">DELETE</button>
+        </div>
+    </fieldset>
+
+    <script src="index.js"></script>
+</body>
+</html>
