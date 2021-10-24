@@ -1,23 +1,26 @@
 package com.example.employeesmanager.employee;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
 @DisplayName("Tests for the database")
+@ExtendWith(MockitoExtension.class)
 class EmployeeServiceTest {
 
-    @Autowired
-    private static EmployeeRepository underTest;
-    private static EmployeeService employeeService;
+    @Mock
+    private EmployeeRepository employeeRepository;
+    private EmployeeService employeeService;
 
-    @BeforeAll
-    static void prepareTests() {
-        employeeService = new EmployeeService(underTest);
+    @BeforeEach
+    void setUp() {
+        employeeService = new EmployeeService(employeeRepository);
     }
 
     @Test
