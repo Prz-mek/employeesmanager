@@ -41,6 +41,9 @@ public class EmployeeService {
         if (optionalEmployee.isPresent() && optionalEmployee.get().getId() != employee.getId()) {
             throw new IllegalStateException("Employee with the same email already exists");
         }
+        if (!employeeRepository.existsById(employee.getId())) {
+            throw new IllegalStateException("Employee with id " + employee.getId() + " does not exist");
+        }
         employeeRepository.save(employee);
     }
 
