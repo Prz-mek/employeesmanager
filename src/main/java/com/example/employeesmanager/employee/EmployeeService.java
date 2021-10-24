@@ -20,7 +20,7 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 
-    public Employee getEmployee(Long employeeId) {
+    public Employee getEmployee(Long employeeId) throws IllegalStateException {
         Optional<Employee> employee = employeeRepository.findById(employeeId);
         if (employee.isEmpty()) {
             throw new IllegalStateException("Employee with id" + employeeId + "does not exist");
@@ -28,7 +28,7 @@ public class EmployeeService {
         return employee.get();
     }
 
-    public void addEmployee(Employee employee) {
+    public void addEmployee(Employee employee) throws IllegalStateException {
         Optional<Employee> employeeByEmail = employeeRepository.findEmployeeByEmail(employee.getEmail());
         if (employeeByEmail.isPresent()) {
             throw new IllegalStateException("Employee already exists");
@@ -36,7 +36,7 @@ public class EmployeeService {
         employeeRepository.save(employee);
     }
 
-    public void updateEmployee(Employee employee) {
+    public void updateEmployee(Employee employee) throws IllegalStateException {
         Optional<Employee> optionalEmployee = employeeRepository.findEmployeeByEmail(employee.getEmail());
         if (optionalEmployee.isPresent() && optionalEmployee.get().getId() != employee.getId()) {
             throw new IllegalStateException("Employee with the same email already exists");
@@ -44,7 +44,7 @@ public class EmployeeService {
         employeeRepository.save(employee);
     }
 
-    public void deleteEmployee(Long employeeId) {
+    public void deleteEmployee(Long employeeId) throws IllegalStateException {
         if (!employeeRepository.existsById(employeeId)) {
             throw new IllegalStateException("Employee with id" + employeeId + "does not exist");
         }
