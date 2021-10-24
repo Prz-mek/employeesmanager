@@ -23,7 +23,7 @@ public class EmployeeService {
     public Employee getEmployee(Long employeeId) throws IllegalStateException {
         Optional<Employee> employee = employeeRepository.findById(employeeId);
         if (employee.isEmpty()) {
-            throw new IllegalStateException("Employee with id" + employeeId + "does not exist");
+            throw new IllegalStateException("Employee with id " + employeeId + " does not exist");
         }
         return employee.get();
     }
@@ -46,7 +46,7 @@ public class EmployeeService {
 
     public void deleteEmployee(Long employeeId) throws IllegalStateException {
         if (!employeeRepository.existsById(employeeId)) {
-            throw new IllegalStateException("Employee with id" + employeeId + "does not exist");
+            throw new IllegalStateException("Employee with id " + employeeId + " does not exist");
         }
         employeeRepository.deleteById(employeeId);
     }
