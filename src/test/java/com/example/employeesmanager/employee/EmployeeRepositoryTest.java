@@ -28,9 +28,9 @@ class EmployeeRepositoryTest {
         if (isInRepo) {
             employeeFromRepo = employeeFromRepoOptional.get();
         }
-
-        // then
-//        assertThat(isInRepo).isTrue();
-//        assertThat(employeeFromRepo).isEqualTo(employee);
+        //then
+        assertThat(isInRepo).isTrue();
+        assertThat(employeeFromRepo).isEqualTo(employee);
     }
+    
 }
