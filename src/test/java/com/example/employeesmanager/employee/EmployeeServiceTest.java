@@ -2,17 +2,18 @@ package com.example.employeesmanager.employee;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @DisplayName("Tests for the database")
 @ExtendWith(MockitoExtension.class)
@@ -20,54 +21,20 @@ class EmployeeServiceTest {
 
     @Mock
     private EmployeeRepository employeeRepository;
-    private EmployeeService employeeService;
+    private AutoCloseable autoCloseable;
+    private EmployeeService underTest;
 
     @BeforeEach
     void setUp() {
-        employeeService = new EmployeeService(employeeRepository);
+        autoCloseable = MockitoAnnotations.openMocks(this);
+        underTest = new EmployeeService(employeeRepository);
     }
 
-    @Test
-    void testszybki() {
-        assertThat(1).isEqualTo(1);
+    @AfterEach
+    void tearDown() throws Exception {
+        autoCloseable.close();
     }
 
-    @Nested
-    @DisplayName("Tests for updating the database")
-    class UpdateTests {
-        String initialEmail;
-        Employee initialEmployee, changedEmployee;
-
-        @BeforeEach
-        void updateTestInit() {
-            initialEmail = "jsmith@example.com";
-            initialEmployee = new Employee("John", "Smith", initialEmail, 5000);
-            changedEmployee = new Employee("John", "Smith", initialEmail, 10000);
-            employeeService.addEmployee(initialEmployee);
-        }
-
-        @Test
-        void updateTest() {
-            employeeService.updateEmployee(changedEmployee);
-
-        }
-
-        @AfterEach
-        void updateTestTerminate() {
-
-        }
-
-        @Nested
-        class UpdateTestWhenX {
-
-        }
-    }
-
-    @Nested
-    @DisplayName("Tests for removing from the database")
-    class RemoveTests {
-
-    }
 
     @Nested
     @DisplayName("Tests for add command")
@@ -75,56 +42,105 @@ class EmployeeServiceTest {
 
         @Test
         @DisplayName("Proper use of add command")
-        void proper_add_command_test() {
-            Employee John = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
-            employeeService.addEmployee(John);
-            assertThat(employeeService.getEmployee(1L)).isEqualTo(John);
+        void add_command_with_proper_data() {
+            Employee employee = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
+            underTest.addEmployee(employee);
+            ArgumentCaptor<Employee> employeeArgumentCaptor = ArgumentCaptor.forClass(Employee.class);
+            verify(employeeRepository).save(employeeArgumentCaptor.capture());
+            Employee capturedEmployee = employeeArgumentCaptor.getValue();
+            assertThat(capturedEmployee).isEqualTo(employee);
         }
 
         @Test
         @DisplayName("Improper use of add command - duplicates")
-        void get_command_with_improper_data() {
-            assertThatThrownBy(() -> {
-                Employee John = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
-                employeeService.addEmployee(John);
-                employeeService.addEmployee(John);
-            }).isInstanceOf(IllegalStateException.class).hasMessageContaining("Employee already exists");
+        void add_command_with_email_already_taken() {
+            Employee employee = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
+            given(employeeRepository.findEmployeeByEmail(employee.getEmail())).willReturn(java.util.Optional.of(employee));
+            assertThatThrownBy(() -> underTest.addEmployee(employee)).isInstanceOf(IllegalStateException.class).hasMessageContaining("Employee already exists");
+            verify(employeeRepository, never()).save(any());
         }
-
     }
+
 
     @Nested
     @DisplayName("Tests for get command")
     class GetTests {
 
-        Employee John, Paul, Candice;
-
-        @BeforeEach
-        void updateTestInit() {
-            John = new Employee("John", "Smith", "smith@gmail.com", 5000);
-            employeeService.addEmployee(new Employee("Paul", "Smith", "paul@gmail.com", 9000));
-            employeeService.addEmployee(new Employee("Candice", "Smith", "candice@gmail.com", 9000));
-        }
-
         @Test
         @DisplayName("Proper use of get command")
-        void proper_get_command_test() {
-            Employee gottenEmployee = employeeService.getEmployee(1L);
-            assertThat(gottenEmployee).isEqualTo(John);
+        void get_command_with_proper_data() {
+            Employee employee = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
+            given(employeeRepository.findById(employee.getId())).willReturn(java.util.Optional.of(employee));
+            assertThat(underTest.getEmployee(employee.getId())).isEqualTo(employee);
         }
 
         @Test
         @DisplayName("Improper use of get command - wrong id number")
-        void get_command_with_improper_data() {
-            assertThatThrownBy(() -> {
-                Employee gottenEmployee = employeeService.getEmployee(4L);
-            }).isInstanceOf(IllegalStateException.class).hasMessageContaining("4");
+        void get_command_with_wrong_id() {
+            Employee employee = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
+            assertThatThrownBy(() -> underTest.getEmployee(employee.getId())).isInstanceOf(IllegalStateException.class).hasMessageContaining("Employee with id " + employee.getId() + " does not exist");
         }
 
         @Test
+        @DisplayName("Proper use of getAll command")
         void get_all_command() {
-            List<Employee> gottenList = employeeService.getAllEmployees();
-            assertThat(gottenList.size()).isEqualTo(3);
+            underTest.getAllEmployees();
+            verify(employeeRepository).findAll();
+        }
+    }
+
+
+    @Nested
+    @DisplayName("Tests for update command")
+    class UpdateTests {
+
+        @Test
+        @DisplayName("Proper use of update command")
+        void update_command_with_proper_data() {
+            Employee employee = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
+            given(employeeRepository.existsById(employee.getId())).willReturn(true);
+            underTest.updateEmployee(employee);
+            verify(employeeRepository).save(employee);
+        }
+
+        @Test
+        @DisplayName("Improper use of update command - employee with same email exists")
+        void upgrade_command_with_email_already_taken() {
+            Employee employee = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
+            Employee otherEmployee = new Employee(2L, "Jonkow", "Alski", "jonkowalski@gmail.com", 6000);
+            given(employeeRepository.findEmployeeByEmail(employee.getEmail())).willReturn(java.util.Optional.of(otherEmployee));
+            assertThatThrownBy(() -> underTest.updateEmployee(employee)).isInstanceOf(IllegalStateException.class).hasMessageContaining("Employee with the same email already exists");
+            verify(employeeRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Improper use of update command - employee does not exist")
+        void upgrade_command_with_employee_not_existing() {
+            Employee employee = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
+            given(employeeRepository.existsById(employee.getId())).willReturn(false);
+            assertThatThrownBy(() -> underTest.updateEmployee(employee)).isInstanceOf(IllegalStateException.class).hasMessageContaining("Employee with id " + employee.getId() + " does not exist");
+        }
+    }
+
+
+    @Nested
+    @DisplayName("Tests for remove command")
+    class RemoveTests {
+
+        @Test
+        @DisplayName("Proper use of remove command")
+        void remove_command_with_proper_data() {
+            Employee employee = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
+            given(employeeRepository.existsById(employee.getId())).willReturn(true);
+            underTest.deleteEmployee(employee.getId());
+            verify(employeeRepository).deleteById(employee.getId());
+        }
+
+        @Test
+        @DisplayName("Improper use of remove command - employee does not exist")
+        void remove_command_with_employee_not_existing() {
+            Employee employee = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
+            assertThatThrownBy(() -> underTest.deleteEmployee(employee.getId())).isInstanceOf(IllegalStateException.class).hasMessageContaining("Employee with id " + employee.getId() + " does not exist");
         }
     }
 }

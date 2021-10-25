@@ -16,6 +16,14 @@ public class EmployeeService {
         this.employeeRepository = employeeRepository;
     }
 
+    public void addEmployee(Employee employee) throws IllegalStateException {
+        Optional<Employee> employeeByEmail = employeeRepository.findEmployeeByEmail(employee.getEmail());
+        if (employeeByEmail.isPresent()) {
+            throw new IllegalStateException("Employee already exists");
+        }
+        employeeRepository.save(employee);
+    }
+
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
@@ -26,14 +34,6 @@ public class EmployeeService {
             throw new IllegalStateException("Employee with id " + employeeId + " does not exist");
         }
         return employee.get();
-    }
-
-    public void addEmployee(Employee employee) throws IllegalStateException {
-        Optional<Employee> employeeByEmail = employeeRepository.findEmployeeByEmail(employee.getEmail());
-        if (employeeByEmail.isPresent()) {
-            throw new IllegalStateException("Employee already exists");
-        }
-        employeeRepository.save(employee);
     }
 
     public void updateEmployee(Employee employee) throws IllegalStateException {
