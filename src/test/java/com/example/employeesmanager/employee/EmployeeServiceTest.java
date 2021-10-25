@@ -53,11 +53,21 @@ class EmployeeServiceTest {
 
         @Test
         @DisplayName("Improper use of add command - duplicates")
-        void add_command_with_email_already_taken() {
+        void add_command_with_duplicate() {
             Employee employee = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
             given(employeeRepository.findEmployeeByEmail(employee.getEmail())).willReturn(java.util.Optional.of(employee));
             assertThatThrownBy(() -> underTest.addEmployee(employee)).isInstanceOf(IllegalStateException.class).hasMessageContaining("Employee already exists");
             verify(employeeRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Improper use of add command - multiple workers with the same email")
+        void add_command_with_email_already_taken() {
+            Employee employee = new Employee(1L, "John", "Kowalski", "jonkowalski@gmail.com", 3000);
+            underTest.addEmployee(employee);
+            Employee employee2 = new Employee(2L, "Paul", "Nowak", "jonkowalski@gmail.com", 4000);
+            given(employeeRepository.findEmployeeByEmail(employee.getEmail())).willReturn(java.util.Optional.of(employee));
+            assertThatThrownBy(() -> underTest.addEmployee(employee2)).isInstanceOf(IllegalStateException.class).hasMessageContaining("Employee already exists");
         }
     }
 
